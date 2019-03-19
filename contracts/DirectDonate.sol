@@ -4,7 +4,7 @@ pragma solidity ^0.4.22;
 contract DirectDonate {
     address public owner;
 
-    uint public projectIndex;
+    string[] public projects;
 
     modifier onlyOwner () {
         require(msg.sender == owner);
@@ -13,10 +13,13 @@ contract DirectDonate {
 
     constructor() public {
         owner = msg.sender;
-        projectIndex = 0;
     }
 
-    function addProject () public {
-        projectIndex++;
+    function projectIndex () public view returns (uint) {
+        return projects.length;
+    }
+
+    function addProject (string projectName) public {
+        projects.push(projectName);
     }
 }
