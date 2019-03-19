@@ -137,4 +137,16 @@ contract('DirectDonate', async (accounts) => {
     assert.equal(donors[0], accounts[2]);
     assert.equal(donors[1], accounts[3]);
   });
+
+  it('should return project\'s donations', async () => {
+    await addProject();
+
+    const value = 1e18;
+    await directDonate.donate(0, { from: accounts[2], value });
+
+    var donations = await directDonate.donations(0);
+
+    assert.equal(donations.length, 1);
+    assert.equal(donations[0], value);
+  });
 });
