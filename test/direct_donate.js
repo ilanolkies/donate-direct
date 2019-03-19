@@ -77,4 +77,45 @@ contract('DirectDonate', async (accounts) => {
 
     assert.equal(balance, previousBalance.toNumber() + value);
   });
+
+  it('should store 3 projects and send founds to receivers', async () => {
+    const projects = [
+      {
+        name: 'KKL',
+        receiver: accounts[1],
+        url: 'https://kklweb.org'
+      },
+      {
+        name: 'unicef',
+        receiver: accounts[2],
+        url: 'https://unicef.org'
+      },
+      {
+        name: 'KKL',
+        receiver: accounts[3],
+        url: 'https://ymca.org'
+      }
+    ];
+
+    for (const project of projects) await directDonate.addProject(project.name, project.receiver, project.url);
+
+    for (const i of [0, 1, 2]) {
+      const project = await directDonate.projects(i);
+
+      assert.equal(project[0], projects[i].name);
+      assert.equal(project[1], projects[i].receiver);
+      assert.equal(project[2], projects[i].url);
+
+      const getReceiverBalance = async () => await web3.eth.getBalance(projects[i].receiver);
+
+      const previousBalance = await getReceiverBalance();
+      const value = 1e18;
+
+      await directDonate.donate(i, { from: accounts[4], value });
+
+      const balance = await getReceiverBalance();
+
+      assert.equal(balance, previousBalance.toNumber() + value);
+    }
+  });
 });
