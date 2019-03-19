@@ -17,4 +17,20 @@ contract('DirectDonate', async (accounts) => {
 
     assert.equal(owner, accounts[0]);
   });
+
+  it('should begin with no projects', async () => {
+    const projectQuantity = await directDonate.projectIndex();
+
+    assert.equal(projectQuantity, 0);
+  });
+
+  it('should add a project', async () => {
+    const previousQuantity = await directDonate.projectIndex();
+
+    await directDonate.addProject();
+
+    const projectQuantity = await directDonate.projectIndex();
+
+    assert.equal(projectQuantity, previousQuantity.toNumber() + 1);
+  });
 });
