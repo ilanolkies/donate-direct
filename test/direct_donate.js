@@ -27,7 +27,7 @@ contract('DirectDonate', async (accounts) => {
   it('should add a project', async () => {
     const previousQuantity = await directDonate.projectIndex();
 
-    await directDonate.addProject('');
+    await directDonate.addProject('', '', '');
 
     const projectQuantity = await directDonate.projectIndex();
 
@@ -37,10 +37,24 @@ contract('DirectDonate', async (accounts) => {
   it('should add and return the project', async () => {
     const projectName = 'NewProject';
 
-    await directDonate.addProject(projectName);
+    await directDonate.addProject(projectName, '', '');
+
+    const project = await directDonate.projectName(0);
+
+    assert.equal(project, projectName);
+  });
+
+  it('should store the project\'s address and url', async () => {
+    const projectName = 'NewProject';
+    const projectReceiver = accounts[1];
+    const projectUrl = 'https://www.kklweb.org/';
+
+    await directDonate.addProject(projectName, projectReceiver, projectUrl);
 
     const project = await directDonate.projects(0);
 
-    assert.equal(project, projectName);
+    assert.equal(project[0], projectName);
+    assert.equal(project[1], projectReceiver);
+    assert.equal(project[2], projectUrl);
   });
 });
