@@ -14,13 +14,7 @@ contract DirectDonate {
         uint[] donations;
     }
 
-    modifier onlyOwner () {
-        require(msg.sender == owner);
-        _;
-    }
-
     constructor() public {
-        owner = msg.sender;
     }
 
     function projectIndex () public view returns (uint) {

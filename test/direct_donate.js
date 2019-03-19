@@ -12,12 +12,6 @@ contract('DirectDonate', async (accounts) => {
 
   it('should deploy contract', async () => { });
 
-  it('should store the deployer account as the owner', async () => {
-    const owner = await directDonate.owner();
-
-    assert.equal(owner, accounts[0]);
-  });
-
   it('should begin with no projects', async () => {
     const projectQuantity = await directDonate.projectIndex();
 
