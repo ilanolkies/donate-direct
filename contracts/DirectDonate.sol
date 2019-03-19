@@ -34,7 +34,13 @@ contract DirectDonate {
         projects.push(project);
     }
 
-    function projectName (uint index) public view returns(string) {
+    function projectName (uint index) public view returns (string) {
         return projects[index].name;
+    }
+
+    function donate (uint index) public payable {
+        address receiver = projects[index].receiver;
+
+        receiver.transfer(msg.value);
     }
 }

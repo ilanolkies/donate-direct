@@ -44,17 +44,34 @@ contract('DirectDonate', async (accounts) => {
     assert.equal(project, projectName);
   });
 
-  it('should store the project\'s address and url', async () => {
-    const projectName = 'NewProject';
-    const projectReceiver = accounts[1];
-    const projectUrl = 'https://www.kklweb.org/';
+  const projectName = 'NewProject';
+  const projectReceiver = accounts[1];
+  const projectUrl = 'https://www.kklweb.org/';
 
+  const addProject = async () => {
     await directDonate.addProject(projectName, projectReceiver, projectUrl);
+  }
+
+  it('should store the project\'s address and url', async () => {
+    await addProject();
 
     const project = await directDonate.projects(0);
 
     assert.equal(project[0], projectName);
     assert.equal(project[1], projectReceiver);
     assert.equal(project[2], projectUrl);
+  });
+
+  it('should send founds to receiver', async () => {
+    await addProject();
+
+    const previousBalance = await web3.eth.getBalance(accounts[1]);
+    const value = 10e18;
+
+    await directDonate.donate(0, { value });
+
+    const balance = await web3.eth.getBalance(accounts[1]);
+
+    assert.equal(balance, previousBalance.toNumber() + value);
   });
 });
