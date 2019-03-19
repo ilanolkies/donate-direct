@@ -65,12 +65,15 @@ contract('DirectDonate', async (accounts) => {
   it('should send founds to receiver', async () => {
     await addProject();
 
-    const previousBalance = await web3.eth.getBalance(accounts[1]);
+    const receiver = (await directDonate.projects(0))[1];
+    const getReceiverBalance = async () => await web3.eth.getBalance(receiver);
+
+    const previousBalance = await getReceiverBalance();
     const value = 10e18;
 
     await directDonate.donate(0, { value });
 
-    const balance = await web3.eth.getBalance(accounts[1]);
+    const balance = await getReceiverBalance();
 
     assert.equal(balance, previousBalance.toNumber() + value);
   });
