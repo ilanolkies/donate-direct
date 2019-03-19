@@ -118,4 +118,23 @@ contract('DirectDonate', async (accounts) => {
       assert.equal(balance, previousBalance.toNumber() + value);
     }
   });
+
+  it('should return project\'s donors', async () => {
+    await addProject();
+
+    await directDonate.donate(0, { from: accounts[2], value: 1e18 });
+
+    var donors = await directDonate.donors(0);
+
+    assert.equal(donors.length, 1);
+    assert.equal(donors[0], accounts[2]);
+
+    await directDonate.donate(0, { from: accounts[3], value: 1e18 });
+
+    donors = await directDonate.donors(0);
+
+    assert.equal(donors.length, 2);
+    assert.equal(donors[0], accounts[2]);
+    assert.equal(donors[1], accounts[3]);
+  });
 });

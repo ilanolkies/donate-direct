@@ -10,6 +10,7 @@ contract DirectDonate {
         string name;
         address receiver;
         string url;
+        address[] donors;
     }
 
     modifier onlyOwner () {
@@ -30,6 +31,8 @@ contract DirectDonate {
         project.name = name;
         project.receiver = receiver;
         project.url = url;
+        address[] memory donors;
+        project.donors = donors;
 
         projects.push(project);
     }
@@ -39,8 +42,15 @@ contract DirectDonate {
     }
 
     function donate (uint index) public payable {
-        address receiver = projects[index].receiver;
+        Project storage project = projects[index];
+        address receiver = project.receiver;
+        project.donors.push(msg.sender);
 
         receiver.transfer(msg.value);
+    }
+
+    function donors (uint index) public view returns (address[] memory) {
+        Project storage project = projects[index];
+        return project.donors;
     }
 }
