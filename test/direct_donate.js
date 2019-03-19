@@ -1,9 +1,7 @@
 const assert = require('assert');
-// instance of DirectDoante.sol contract in /contracts folder
 const DirectDonate = artifacts.require('DirectDonate');
 
 contract('DirectDonate', async (accounts) => {
-  // deploy contract on testing network
   var directDonate;
 
   beforeEach(async () => {
