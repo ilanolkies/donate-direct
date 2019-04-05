@@ -1,5 +1,8 @@
-const assert = require('assert');
 const DirectDonate = artifacts.require('DirectDonate');
+
+var expect = require('chai')
+.use(require('bn-chai')(web3.utils.BN))
+.expect;
 
 contract('DirectDonate', async (accounts) => {
   var directDonate;
@@ -13,32 +16,30 @@ contract('DirectDonate', async (accounts) => {
   it('should begin with no projects', async () => {
     const projectQuantity = await directDonate.projectIndex();
 
-    assert.equal(projectQuantity, 0);
-  });
-
-  it('should add a project', async () => {
-    const previousQuantity = await directDonate.projectIndex();
-
-    await directDonate.addProject('', '', '');
-
-    const projectQuantity = await directDonate.projectIndex();
-
-    assert.equal(projectQuantity, previousQuantity.toNumber() + 1);
-  });
-
-  it('should add and return the project', async () => {
-    const projectName = 'NewProject';
-
-    await directDonate.addProject(projectName, '', '');
-
-    const project = await directDonate.projectName(0);
-
-    assert.equal(project, projectName);
+    expect(projectQuantity).to.eq.BN(web3.utils.toBN(0));
   });
 
   const projectName = 'NewProject';
   const projectReceiver = accounts[1];
   const projectUrl = 'https://www.kklweb.org/';
+
+  it('should add a project', async () => {
+    const previousQuantity = await directDonate.projectIndex();
+
+    await directDonate.addProject(projectName, projectReceiver, projectUrl);
+
+    const projectQuantity = await directDonate.projectIndex();
+
+    expect(projectQuantity).to.eq.BN(previousQuantity.add(web3.utils.toBN(1)));
+  });
+
+  it('should add and return the project', async () => {
+    await directDonate.addProject(projectName, projectReceiver, projectUrl);
+
+    const project = await directDonate.projectName(0);
+
+    expect(project).to.eq.string(projectName);
+  });
 
   const addProject = async () => {
     await directDonate.addProject(projectName, projectReceiver, projectUrl);
@@ -49,9 +50,9 @@ contract('DirectDonate', async (accounts) => {
 
     const project = await directDonate.projects(0);
 
-    assert.equal(project[0], projectName);
-    assert.equal(project[1], projectReceiver);
-    assert.equal(project[2], projectUrl);
+    expect(project[0]).to.eq.string(projectName);
+    expect(project[1]).to.eq.string(projectReceiver);
+    expect(project[2]).to.eq.string(projectUrl);
   });
 
   it('should send founds to receiver', async () => {
@@ -61,13 +62,13 @@ contract('DirectDonate', async (accounts) => {
     const getReceiverBalance = async () => await web3.eth.getBalance(receiver);
 
     const previousBalance = await getReceiverBalance();
-    const value = 10e18;
+    const value = web3.utils.toBN(10e18);
 
     await directDonate.donate(0, { value });
 
     const balance = await getReceiverBalance();
 
-    assert.equal(balance, previousBalance.toNumber() + value);
+    expect(balance).to.eq.BN(web3.utils.toBN(previousBalance).add(value));
   });
 
   it('should store 3 projects and send founds to receivers', async () => {
@@ -94,20 +95,20 @@ contract('DirectDonate', async (accounts) => {
     for (const i of [0, 1, 2]) {
       const project = await directDonate.projects(i);
 
-      assert.equal(project[0], projects[i].name);
-      assert.equal(project[1], projects[i].receiver);
-      assert.equal(project[2], projects[i].url);
+      expect(project[0]).to.eq.string(projects[i].name);
+      expect(project[1]).to.eq.string(projects[i].receiver);
+      expect(project[2]).to.eq.string(projects[i].url);
 
       const getReceiverBalance = async () => await web3.eth.getBalance(projects[i].receiver);
 
       const previousBalance = await getReceiverBalance();
-      const value = 1e18;
+      const value = web3.utils.toBN(1e18);
 
       await directDonate.donate(i, { from: accounts[4], value });
 
       const balance = await getReceiverBalance();
 
-      assert.equal(balance, previousBalance.toNumber() + value);
+      expect(balance).to.eq.BN(web3.utils.toBN(previousBalance).add(value));
     }
   });
 
@@ -118,27 +119,27 @@ contract('DirectDonate', async (accounts) => {
 
     var donors = await directDonate.donors(0);
 
-    assert.equal(donors.length, 1);
-    assert.equal(donors[0], accounts[2]);
+    expect(donors).to.have.lengthOf(1);
+    expect(donors[0]).to.eq.string(accounts[2]);
 
     await directDonate.donate(0, { from: accounts[3], value: 1e18 });
 
     donors = await directDonate.donors(0);
 
-    assert.equal(donors.length, 2);
-    assert.equal(donors[0], accounts[2]);
-    assert.equal(donors[1], accounts[3]);
+    expect(donors).to.have.lengthOf(2);
+    expect(donors[0]).to.eq.string(accounts[2]);
+    expect(donors[1]).to.eq.string(accounts[3]);
   });
 
   it('should return project\'s donations', async () => {
     await addProject();
 
-    const value = 1e18;
+    const value = web3.utils.toBN(1e18);
     await directDonate.donate(0, { from: accounts[2], value });
 
     var donations = await directDonate.donations(0);
 
-    assert.equal(donations.length, 1);
-    assert.equal(donations[0], value);
+    expect(donations).to.have.lengthOf(1);
+    expect(donations[0]).to.eq.BN(value);
   });
 });

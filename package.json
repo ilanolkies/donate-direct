@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "bn-chai": "^1.0.1",
+    "chai": "^4.2.0"
+  }
+}

@@ -1,5 +1,4 @@
-pragma solidity ^0.4.22;
-
+pragma solidity ^0.5.2;
 
 contract DirectDonate {
     address public owner;
@@ -8,7 +7,7 @@ contract DirectDonate {
 
     struct Project {
         string name;
-        address receiver;
+        address payable receiver;
         string url;
         address[] donors;
         uint[] donations;
@@ -21,7 +20,7 @@ contract DirectDonate {
         return projects.length;
     }
 
-    function addProject (string name, address receiver, string url) public {
+    function addProject (string memory name, address payable receiver, string memory url) public {
         Project memory project;
         project.name = name;
         project.receiver = receiver;
@@ -34,13 +33,13 @@ contract DirectDonate {
         projects.push(project);
     }
 
-    function projectName (uint index) public view returns (string) {
+    function projectName (uint index) public view returns (string memory) {
         return projects[index].name;
     }
 
     function donate (uint index) public payable {
         Project storage project = projects[index];
-        address receiver = project.receiver;
+        address payable receiver = project.receiver;
         project.donors.push(msg.sender);
         project.donations.push(msg.value);
 
